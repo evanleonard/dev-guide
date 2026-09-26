@@ -253,6 +253,13 @@ else
     ok "OrbStack container runtime ready."
 fi
 
+# Ensure Docker and Docker Compose CLI plugins are configured
+if [ -d "/Applications/OrbStack.app/Contents/MacOS/xbin" ]; then
+    mkdir -p "$HOME/.docker/cli-plugins"
+    ln -sf /Applications/OrbStack.app/Contents/MacOS/xbin/docker-compose "$HOME/.docker/cli-plugins/docker-compose"
+    ok "Configured Docker CLI and Compose plugins."
+fi
+
 # GUI for Jujutsu (GG)
 if ! brew list --cask gg &>/dev/null && [ ! -d "/Applications/gg.app" ]; then
     info "Installing GG (GUI for Jujutsu)..."

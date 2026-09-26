@@ -17,6 +17,11 @@ fi
 
 export PATH="$HOME/.local/bin:$HOME/bin:$PATH"
 
+# OrbStack Docker & container tools
+if [[ -d "/Applications/OrbStack.app/Contents/MacOS/xbin" ]]; then
+    export PATH="/Applications/OrbStack.app/Contents/MacOS/xbin:$PATH"
+fi
+
 # pnpm
 export PNPM_HOME="$HOME/Library/pnpm"
 case ":$PATH:" in
@@ -66,9 +71,9 @@ fi
 
 autoload -Uz compinit
 if [[ -n "$HOME/.zcompdump(#qN.mh+24)" ]]; then
-    compinit
+    compinit -u
 else
-    compinit -C
+    compinit -C -u
 fi
 
 zstyle ':completion:*' menu select
