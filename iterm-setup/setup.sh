@@ -261,6 +261,14 @@ else
     ok "GG (Jujutsu GUI) ready."
 fi
 
+# Obsidian note-taking application
+if ! brew list --cask obsidian &>/dev/null && [ ! -d "/Applications/Obsidian.app" ]; then
+    info "Installing Obsidian..."
+    brew install --cask --quiet obsidian || warn "Obsidian install deferred."
+else
+    ok "Obsidian ready."
+fi
+
 # ------------------------------------------------------------------------------
 # 5. Core CLI Utilities
 # ------------------------------------------------------------------------------
@@ -482,6 +490,55 @@ if [ -f "$HOME/.ssh/id_ed25519" ] && [ -t 0 ] && [ "$NON_INTERACTIVE" = false ];
     ssh-add --apple-use-keychain "$HOME/.ssh/id_ed25519" 2>/dev/null || true
 fi
 
+# Obsidian Git Plugin (Vinzent03/obsidian-git)
+OBSIDIAN_CACHE="$HOME/.config/obsidian/plugins/obsidian-git"
+mkdir -p "$OBSIDIAN_CACHE"
+
+GIT_RELEASE_URL="https://github.com/Vinzent03/obsidian-git/releases/latest/download"
+if [ ! -f "$OBSIDIAN_CACHE/manifest.json" ] || [ ! -f "$OBSIDIAN_CACHE/main.js" ]; then
+    info "Downloading latest Obsidian Git plugin..."
+    curl -fsSL "$GIT_RELEASE_URL/manifest.json" -o "$OBSIDIAN_CACHE/manifest.json" 2>/dev/null || true
+    curl -fsSL "$GIT_RELEASE_URL/main.js" -o "$OBSIDIAN_CACHE/main.js" 2>/dev/null || true
+    curl -fsSL "$GIT_RELEASE_URL/styles.css" -o "$OBSIDIAN_CACHE/styles.css" 2>/dev/null || true
+fi
+
+install_obsidian_git() {
+    local vault_dir="$1"
+    if [ -d "$vault_dir" ] && [ -f "$OBSIDIAN_CACHE/main.js" ]; then
+        local plugin_dir="$vault_dir/.obsidian/plugins/obsidian-git"
+        mkdir -p "$plugin_dir"
+        cp "$OBSIDIAN_CACHE/manifest.json" "$plugin_dir/manifest.json"
+        cp "$OBSIDIAN_CACHE/main.js" "$plugin_dir/main.js"
+        [ -f "$OBSIDIAN_CACHE/styles.css" ] && cp "$OBSIDIAN_CACHE/styles.css" "$plugin_dir/styles.css"
+
+        local comm_plugins="$vault_dir/.obsidian/community-plugins.json"
+        if [ -f "$comm_plugins" ]; then
+            if ! grep -q '"obsidian-git"' "$comm_plugins" 2>/dev/null; then
+                if command -v jq >/dev/null 2>&1; then
+                    jq '. + ["obsidian-git"] | unique' "$comm_plugins" > "${comm_plugins}.tmp" && mv "${comm_plugins}.tmp" "$comm_plugins"
+                fi
+            fi
+        else
+            echo '["obsidian-git"]' > "$comm_plugins"
+        fi
+        ok "Obsidian Git plugin configured in $(basename "$vault_dir")"
+    fi
+}
+
+# Auto-configure git plugin for all registered Obsidian vaults
+if [ -f "$HOME/Library/Application Support/obsidian/obsidian.json" ] && command -v jq >/dev/null 2>&1; then
+    for vault in $(jq -r '.vaults[].path // empty' "$HOME/Library/Application Support/obsidian/obsidian.json" 2>/dev/null); do
+        install_obsidian_git "$vault"
+    done
+fi
+
+# Also check common workspace vault paths
+for potential_vault in "$HOME/dev/banda/guide" "$HOME/dev/guide" "$HOME/Documents/Obsidian Vault"; do
+    if [ -d "$potential_vault/.obsidian" ]; then
+        install_obsidian_git "$potential_vault"
+    fi
+done
+
 # ------------------------------------------------------------------------------
 # 7. Practical macOS Developer Defaults
 # ------------------------------------------------------------------------------
@@ -536,4 +593,5 @@ printf "  uv              -> Modern, blazing fast Python package manager\n"
 printf "  tldr <cmd>      -> Quick community cheat sheets\n"
 printf "  delta           -> Syntax-highlighting git diff pager\n"
 printf "  jjui / jju      -> Jujutsu interactive Terminal UI\n"
-printf "  gg              -> Jujutsu desktop visual GUI\n\n"
+printf "  gg              -> Jujutsu desktop visual GUI\n"
+printf "  obsidian        -> Markdown knowledge base & notes (with git plugin pre-installed)\n\n"

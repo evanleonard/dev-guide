@@ -48,4 +48,5 @@ flowchart TD
 - **SSH Keychain Integration**: `~/.ssh/config` automatically loads GitHub SSH keys from macOS Keychain.
 - **Modern Package Managers**: `pnpm` (Node), `uv` (Python), `fnm` (Node versions with 22 LTS default).
 - **Container Runtime**: `OrbStack` fast Apple Silicon native Docker/Linux container runtime.
+- **Knowledge Base**: `Obsidian` markdown app with pre-configured `obsidian-git` community plugin for auto-syncing notes across repositories.
 - **Quick Reference**: `tealdeer` (`tldr`) for instant command syntax cheat sheets.

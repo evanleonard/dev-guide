@@ -50,6 +50,7 @@ chmod +x setup.sh
   - `dust` visual disk usage inspection (`du`).
   - `neovim` (`nvim`) modern terminal text editor.
   - `OrbStack` fast, low-overhead Docker & Linux container runtime.
+  - `Obsidian` markdown knowledge base application (with automatic `obsidian-git` community plugin installation and enablement).
   - `btop` for resource monitoring.
 
 ---
