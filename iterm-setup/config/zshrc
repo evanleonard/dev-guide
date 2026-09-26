@@ -118,6 +118,10 @@ if command -v lazygit >/dev/null 2>&1; then
     alias lg='lazygit'
 fi
 
+if command -v jjui >/dev/null 2>&1; then
+    alias jju='jjui'
+fi
+
 if command -v nvim >/dev/null 2>&1; then
     alias v='nvim'
     alias vi='nvim'

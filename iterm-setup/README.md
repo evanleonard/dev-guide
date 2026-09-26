@@ -39,6 +39,8 @@ chmod +x setup.sh
   - `zoxide` for directory jumping (`z <dir>`).
   - `fzf` without bulky borders (`Ctrl+R` for history, `Ctrl+T` for files).
   - `lazygit` for terminal git workflow (`lg`).
+  - `jj` & `jjui` for modern version control and interactive terminal DAG navigation (`jju`).
+  - `GG` desktop visual GUI for Jujutsu.
   - `delta` for syntax-highlighted git diffs and logs.
   - `fnm` for blazing fast Node version management (pre-configured with Node 22 LTS).
   - `pnpm` fast disk-efficient package manager.
@@ -63,6 +65,8 @@ chmod +x setup.sh
 | `cat <file>` | Fast syntax-highlighted viewer via `bat` |
 | `z <dir>` | Intelligent directory jump via `zoxide` |
 | `lg` | Launch LazyGit |
+| `jjui` / `jju` | Launch Jujutsu Terminal UI (`jjui`) |
+| `gg` | Launch GG (Jujutsu Desktop GUI) |
 | `v` / `vi` | Open Neovim |
 | `du` | Interactive disk usage tree via `dust` |
 | `tldr <cmd>` | Instant CLI cheat sheet via `tealdeer` |

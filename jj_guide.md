@@ -176,4 +176,26 @@ alias jdiff='jj diff'
 alias jdesc='jj describe'
 alias jnew='jj new'
 alias jundo='jj undo'
+alias jju='jjui'
 ```
+
+---
+
+## 8. Visual Apps & GUIs
+
+### Terminal UI: `jjui` (Recommended)
+`jjui` is an interactive TUI (analogous to `lazygit` for Git) designed specifically for Jujutsu.
+* **Launch**: `jjui` (or `jju`)
+* **Features**:
+  * Visual, interactive revision DAG navigation.
+  * Fast keyboard shortcuts to rebase, squash, describe, split, and abandon commits.
+  * Inline diff viewer with syntax highlighting.
+* **Install**: `brew install jjui`
+
+### Desktop GUI: `GG`
+`GG` is a dedicated graphical application for Jujutsu workflows.
+* **Launch**: `gg` or launch `GG.app` from Spotlight / Applications
+* **Features**:
+  * Drag-and-drop rebasing of change stacks.
+  * Full inspection of commit metadata, diffs, and the operation log (`jj op log`).
+* **Install**: `brew install --cask gg`

@@ -253,6 +253,14 @@ else
     ok "OrbStack container runtime ready."
 fi
 
+# GUI for Jujutsu (GG)
+if ! brew list --cask gg &>/dev/null && [ ! -d "/Applications/gg.app" ]; then
+    info "Installing GG (GUI for Jujutsu)..."
+    brew install --cask --quiet gg || warn "GG install deferred."
+else
+    ok "GG (Jujutsu GUI) ready."
+fi
+
 # ------------------------------------------------------------------------------
 # 5. Core CLI Utilities
 # ------------------------------------------------------------------------------
@@ -273,6 +281,8 @@ PACKAGES=(
     git
     lazygit
     git-delta
+    jj
+    jjui
     pnpm
     fnm
     uv
@@ -524,4 +534,6 @@ printf "  fnm             -> Fast Node Manager (Node 22 LTS ready)\n"
 printf "  pnpm            -> Fast, disk space efficient package manager\n"
 printf "  uv              -> Modern, blazing fast Python package manager\n"
 printf "  tldr <cmd>      -> Quick community cheat sheets\n"
-printf "  delta           -> Syntax-highlighting git diff pager\n\n"
+printf "  delta           -> Syntax-highlighting git diff pager\n"
+printf "  jjui / jju      -> Jujutsu interactive Terminal UI\n"
+printf "  gg              -> Jujutsu desktop visual GUI\n\n"
