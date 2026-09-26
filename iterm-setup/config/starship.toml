@@ -1,0 +1,42 @@
+# ~/.config/starship.toml
+# Clean, minimal, distraction-free single-line prompt with pwd preceding the prompt
+
+format = "$directory$git_branch$git_status$cmd_duration$character"
+
+command_timeout = 500
+
+[directory]
+style = "bold cyan"
+truncation_length = 0
+truncate_to_repo = false
+read_only = " [ro]"
+read_only_style = "red"
+
+[git_branch]
+style = "bold magenta"
+format = "[$symbol$branch]($style) "
+symbol = "git:"
+
+[git_status]
+style = "red"
+format = '([$all_status$ahead_behind]($style) )'
+conflicted = "="
+ahead = ">"
+behind = "<"
+diverged = "<>"
+untracked = "?"
+stashed = "$"
+modified = "!"
+staged = "+"
+renamed = "»"
+deleted = "x"
+
+[cmd_duration]
+min_time = 3_000
+format = "[$duration]($style) "
+style = "yellow"
+
+[character]
+success_symbol = "[❯](green)"
+error_symbol = "[❯](red)"
+vimcmd_symbol = "[❮](yellow)"

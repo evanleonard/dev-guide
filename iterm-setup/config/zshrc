@@ -1,0 +1,177 @@
+# ==============================================================================
+# Clean Minimal macOS Zsh Configuration
+# ==============================================================================
+
+# ------------------------------------------------------------------------------
+# 1. Environment & Path
+# ------------------------------------------------------------------------------
+export LANG="en_US.UTF-8"
+export LC_ALL="en_US.UTF-8"
+
+# Add Homebrew to PATH (Apple Silicon & Intel)
+if [[ -f /opt/homebrew/bin/brew ]]; then
+    eval "$(/opt/homebrew/bin/brew shellenv)"
+elif [[ -f /usr/local/bin/brew ]]; then
+    eval "$(/usr/local/bin/brew shellenv)"
+fi
+
+export PATH="$HOME/.local/bin:$HOME/bin:$PATH"
+
+if command -v nvim >/dev/null 2>&1; then
+    export EDITOR="nvim"
+elif command -v vim >/dev/null 2>&1; then
+    export EDITOR="vim"
+else
+    export EDITOR="nano"
+fi
+export VISUAL="$EDITOR"
+
+if command -v bat >/dev/null 2>&1; then
+    export PAGER="bat --plain"
+    export BAT_THEME="ansi"
+    export BAT_STYLE="numbers,changes"
+fi
+
+# ------------------------------------------------------------------------------
+# 2. History Settings
+# ------------------------------------------------------------------------------
+HISTFILE="$HOME/.zsh_history"
+HISTSIZE=50000
+SAVEHIST=50000
+setopt EXTENDED_HISTORY
+setopt HIST_EXPIRE_DUPS_FIRST
+setopt HIST_IGNORE_DUPS
+setopt HIST_IGNORE_ALL_DUPS
+setopt HIST_FIND_NO_DUPS
+setopt HIST_IGNORE_SPACE
+setopt HIST_SAVE_NO_DUPS
+setopt SHARE_HISTORY
+
+# ------------------------------------------------------------------------------
+# 3. Autocompletion
+# ------------------------------------------------------------------------------
+autoload -Uz compinit
+if [[ -n "$HOME/.zcompdump(#qN.mh+24)" ]]; then
+    compinit
+else
+    compinit -C
+fi
+
+zstyle ':completion:*' menu select
+zstyle ':completion:*' matcher-list 'm:{a-zA-Z}={A-Za-z}' 'r:|=*' 'l:|=* r:|=*'
+zstyle ':completion:*' list-colors "${(s.:.)LS_COLORS}"
+
+# ------------------------------------------------------------------------------
+# 4. Clean Aliases
+# ------------------------------------------------------------------------------
+if command -v eza >/dev/null 2>&1; then
+    alias ls='eza --group-directories-first'
+    alias ll='eza -lh --group-directories-first --git'
+    alias la='eza -lah --group-directories-first --git'
+    alias lt='eza --tree --level=2'
+else
+    alias ls='ls -G'
+    alias ll='ls -lh'
+    alias la='ls -lah'
+fi
+
+if command -v bat >/dev/null 2>&1; then
+    alias cat='bat --style=plain'
+    alias catp='bat'
+fi
+
+if command -v zoxide >/dev/null 2>&1; then
+    alias cd='z'
+fi
+
+alias g='git'
+alias gst='git status -sb'
+alias ga='git add'
+alias gaa='git add --all'
+alias gc='git commit -m'
+alias gca='git commit --amend'
+alias gp='git push'
+alias gpf='git push --force-with-lease'
+alias gl='git pull'
+alias gd='git diff'
+alias gds='git diff --staged'
+alias gco='git checkout'
+alias gcb='git checkout -b'
+alias gb='git branch'
+alias glog='git log --oneline --decorate --graph -n 20'
+
+if command -v lazygit >/dev/null 2>&1; then
+    alias lg='lazygit'
+fi
+
+alias ..='cd ..'
+alias ...='cd ../..'
+alias ....='cd ../../..'
+alias reload='source ~/.zshrc'
+alias path='echo $PATH | tr ":" "\n"'
+alias ports='lsof -iTCP -sTCP:LISTEN -P -n'
+
+# ------------------------------------------------------------------------------
+# 5. Functions
+# ------------------------------------------------------------------------------
+mkcd() {
+    mkdir -p "$1" && cd "$1"
+}
+
+extract() {
+    if [ -f "$1" ]; then
+        case "$1" in
+            *.tar.bz2)   tar xjf "$1"     ;;
+            *.tar.gz)    tar xzf "$1"     ;;
+            *.bz2)       bunzip2 "$1"     ;;
+            *.rar)       unrar x "$1"     ;;
+            *.gz)        gunzip "$1"      ;;
+            *.tar)       tar xf "$1"      ;;
+            *.tbz2)      tar xjf "$1"     ;;
+            *.tgz)       tar xzf "$1"     ;;
+            *.zip)       unzip "$1"       ;;
+            *.Z)         uncompress "$1"  ;;
+            *.7z)        7z x "$1"        ;;
+            *)           echo "'$1' cannot be extracted via extract()" ;;
+        esac
+    else
+        echo "'$1' is not a valid file"
+    fi
+}
+
+myip() {
+    echo "Local IP:  $(ipconfig getifaddr en0 2>/dev/null || echo 'Not connected')"
+    echo "Public IP: $(curl -s https://api.ipify.org 2>/dev/null || echo 'Unavailable')"
+}
+
+# ------------------------------------------------------------------------------
+# 6. Tool Integrations
+# ------------------------------------------------------------------------------
+if command -v fzf >/dev/null 2>&1; then
+    eval "$(fzf --zsh)"
+    export FZF_DEFAULT_OPTS="--height 40% --layout=reverse --border=none"
+    if command -v fd >/dev/null 2>&1; then
+        export FZF_DEFAULT_COMMAND='fd --type f --strip-cwd-prefix --hidden --follow --exclude .git'
+        export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
+    fi
+fi
+
+if command -v zoxide >/dev/null 2>&1; then
+    eval "$(zoxide init zsh)"
+fi
+
+HOMEBREW_PREFIX="${HOMEBREW_PREFIX:-$(brew --prefix 2>/dev/null || echo '/opt/homebrew')}"
+
+if [[ -f "$HOMEBREW_PREFIX/share/zsh-autosuggestions/zsh-autosuggestions.zsh" ]]; then
+    source "$HOMEBREW_PREFIX/share/zsh-autosuggestions/zsh-autosuggestions.zsh"
+    ZSH_AUTOSUGGEST_STRATEGY=(history completion)
+    ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='fg=244'
+fi
+
+if [[ -f "$HOMEBREW_PREFIX/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh" ]]; then
+    source "$HOMEBREW_PREFIX/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
+fi
+
+if command -v starship >/dev/null 2>&1; then
+    eval "$(starship init zsh)"
+fi
