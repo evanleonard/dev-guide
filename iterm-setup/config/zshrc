@@ -17,6 +17,13 @@ fi
 
 export PATH="$HOME/.local/bin:$HOME/bin:$PATH"
 
+# pnpm
+export PNPM_HOME="$HOME/Library/pnpm"
+case ":$PATH:" in
+  *":$PNPM_HOME:"*) ;;
+  *) export PATH="$PNPM_HOME:$PATH" ;;
+esac
+
 if command -v nvim >/dev/null 2>&1; then
     export EDITOR="nvim"
 elif command -v vim >/dev/null 2>&1; then
@@ -50,6 +57,13 @@ setopt SHARE_HISTORY
 # ------------------------------------------------------------------------------
 # 3. Autocompletion
 # ------------------------------------------------------------------------------
+HOMEBREW_PREFIX="${HOMEBREW_PREFIX:-$(brew --prefix 2>/dev/null || echo '/opt/homebrew')}"
+
+# Add Homebrew zsh-completions to fpath before compinit
+if [[ -d "$HOMEBREW_PREFIX/share/zsh-completions" ]]; then
+    fpath=("$HOMEBREW_PREFIX/share/zsh-completions" $fpath)
+fi
+
 autoload -Uz compinit
 if [[ -n "$HOME/.zcompdump(#qN.mh+24)" ]]; then
     compinit
@@ -102,6 +116,16 @@ alias glog='git log --oneline --decorate --graph -n 20'
 
 if command -v lazygit >/dev/null 2>&1; then
     alias lg='lazygit'
+fi
+
+if command -v nvim >/dev/null 2>&1; then
+    alias v='nvim'
+    alias vi='nvim'
+    alias vim='nvim'
+fi
+
+if command -v dust >/dev/null 2>&1; then
+    alias du='dust'
 fi
 
 alias ..='cd ..'
@@ -158,6 +182,16 @@ fi
 
 if command -v zoxide >/dev/null 2>&1; then
     eval "$(zoxide init zsh)"
+fi
+
+# fnm (Fast Node Manager - respects .nvmrc automatically)
+if command -v fnm >/dev/null 2>&1; then
+    eval "$(fnm env --use-on-cd --shell zsh)"
+fi
+
+# direnv (automatic environment variable loading from .envrc / .env)
+if command -v direnv >/dev/null 2>&1; then
+    eval "$(direnv hook zsh)"
 fi
 
 HOMEBREW_PREFIX="${HOMEBREW_PREFIX:-$(brew --prefix 2>/dev/null || echo '/opt/homebrew')}"

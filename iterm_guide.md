@@ -35,4 +35,17 @@ flowchart TD
 - `cat` mapped to `bat --style=numbers,changes` with native ANSI colors.
 - `z` mapped to `zoxide` for fast directory navigation.
 - `Ctrl+R` / `Ctrl+T` mapped to `fzf` without invasive borders.
+- `v`, `vi` mapped to `nvim` (Neovim).
+- `du` mapped to `dust` for intuitive disk analysis.
+- `fnm` integrated for automatic Node version switching based on `.nvmrc`.
+- `pnpm` configured in PATH.
+- `direnv` configured for per-directory environment variable loading.
 - Safe backup of existing `~/.zshrc` preserved before writes.
+
+### 4. Git & Developer Toolchain
+- **Delta**: Syntax-highlighting diff pager configured for `git diff` and interactive diffs.
+- **Global .gitignore**: `~/.gitignore_global` suppresses `.DS_Store`, IDE folders, and swap files.
+- **SSH Keychain Integration**: `~/.ssh/config` automatically loads GitHub SSH keys from macOS Keychain.
+- **Modern Package Managers**: `pnpm` (Node), `uv` (Python), `fnm` (Node versions with 22 LTS default).
+- **Container Runtime**: `OrbStack` fast Apple Silicon native Docker/Linux container runtime.
+- **Quick Reference**: `tealdeer` (`tldr`) for instant command syntax cheat sheets.

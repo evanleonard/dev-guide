@@ -43,6 +43,11 @@ EOF
     esac
 done
 
+if [ "$NON_INTERACTIVE" = true ]; then
+    export HOMEBREW_NO_ENV_HINTS=1
+    export NONINTERACTIVE=1
+fi
+
 confirm() {
     if [ "$NON_INTERACTIVE" = true ]; then
         return 0
@@ -240,6 +245,14 @@ else
     ok "Color presets ready."
 fi
 
+# Container runtime (OrbStack: fast, lightweight Docker replacement for Apple Silicon)
+if ! brew list --cask orbstack &>/dev/null && [ ! -d "/Applications/OrbStack.app" ]; then
+    info "Installing OrbStack (lightweight Docker & Linux runtime)..."
+    brew install --cask --quiet orbstack || warn "OrbStack install deferred."
+else
+    ok "OrbStack container runtime ready."
+fi
+
 # ------------------------------------------------------------------------------
 # 5. Core CLI Utilities
 # ------------------------------------------------------------------------------
@@ -249,6 +262,7 @@ PACKAGES=(
     starship
     zsh-autosuggestions
     zsh-syntax-highlighting
+    zsh-completions
     eza
     bat
     fzf
@@ -258,6 +272,14 @@ PACKAGES=(
     btop
     git
     lazygit
+    git-delta
+    pnpm
+    fnm
+    uv
+    tealdeer
+    direnv
+    dust
+    neovim
 )
 
 for pkg in "${PACKAGES[@]}"; do
@@ -268,6 +290,26 @@ for pkg in "${PACKAGES[@]}"; do
         brew install --quiet "$pkg"
     fi
 done
+
+# Initialize tealdeer (tldr) cache
+if command -v tldr >/dev/null 2>&1; then
+    info "Updating tealdeer tldr cache..."
+    tldr --update 2>/dev/null || true
+fi
+
+# Ensure Node 22 LTS is available via fnm
+if command -v fnm >/dev/null 2>&1; then
+    eval "$(fnm env)"
+    if ! fnm list 2>/dev/null | grep -q "v22"; then
+        info "Installing Node 22 (LTS) via fnm..."
+        fnm install 22 || true
+        fnm default 22 || true
+        ok "Node 22 LTS installed via fnm."
+    else
+        ok "Node 22 LTS ready via fnm."
+    fi
+fi
+
 ok "CLI utilities installed."
 
 # ------------------------------------------------------------------------------
@@ -371,6 +413,65 @@ if [[ -f "$ZSHRC_SRC" ]]; then
     fi
 fi
 
+# Global Gitignore (~/.gitignore_global)
+GLOBAL_GITIGNORE="$HOME/.gitignore_global"
+if [ ! -f "$GLOBAL_GITIGNORE" ]; then
+    cat > "$GLOBAL_GITIGNORE" << 'EOF'
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+*.swp
+*.swo
+*~
+.idea/
+.vscode/
+*.local
+EOF
+    git config --global core.excludesfile "$GLOBAL_GITIGNORE"
+    ok "Created global gitignore (~/.gitignore_global)."
+else
+    git config --global core.excludesfile "$GLOBAL_GITIGNORE"
+    ok "Global gitignore ready."
+fi
+
+# Git Delta configuration (syntax-highlighting diff pager)
+if command -v delta >/dev/null 2>&1; then
+    git config --global core.pager "delta"
+    git config --global interactive.diffFilter "delta --color-only"
+    git config --global delta.navigate true
+    git config --global delta.light false
+    git config --global delta.side-by-side false
+    git config --global delta.line-numbers true
+    ok "Configured Git to use Delta for syntax-highlighted diffs."
+fi
+
+# macOS SSH Keychain integration (~/.ssh/config)
+SSH_CONFIG="$HOME/.ssh/config"
+mkdir -p "$HOME/.ssh"
+chmod 700 "$HOME/.ssh"
+
+if [ ! -f "$SSH_CONFIG" ] || ! grep -q "Host github.com" "$SSH_CONFIG" 2>/dev/null; then
+    cat >> "$SSH_CONFIG" << 'EOF'
+
+Host github.com
+    AddKeysToAgent yes
+    UseKeychain yes
+    IdentityFile ~/.ssh/id_ed25519
+EOF
+    chmod 600 "$SSH_CONFIG"
+    ok "Configured ~/.ssh/config with GitHub Keychain integration."
+else
+    ok "SSH config for github.com ready."
+fi
+
+if [ -f "$HOME/.ssh/id_ed25519" ] && [ -t 0 ] && [ "$NON_INTERACTIVE" = false ]; then
+    ssh-add --apple-use-keychain "$HOME/.ssh/id_ed25519" 2>/dev/null || true
+fi
+
 # ------------------------------------------------------------------------------
 # 7. Practical macOS Developer Defaults
 # ------------------------------------------------------------------------------
@@ -409,11 +510,18 @@ printf "\n${BOLD}Setup complete.${RESET}\n\n"
 printf "Next steps:\n"
 printf "  1. Launch iTerm2 (/Applications/iTerm.app)\n"
 printf "  2. Run 'source ~/.zshrc' to activate the shell\n\n"
-printf "Aliases configured:\n"
+printf "Key tools & aliases configured:\n"
 printf "  ls, ll, la, lt  -> eza (grouped directories, git status)\n"
 printf "  cat, catp       -> bat (plain syntax-highlighting)\n"
 printf "  cd <dir>        -> z <dir> (zoxide jump)\n"
 printf "  lg              -> lazygit\n"
+printf "  v, vi           -> nvim (Neovim)\n"
+printf "  du              -> dust (interactive disk usage)\n"
 printf "  Ctrl + R        -> fzf history search\n"
 printf "  Ctrl + T        -> fzf file search\n"
-printf "  glog            -> concise one-line git log graph\n\n"
+printf "  glog            -> concise one-line git log graph\n"
+printf "  fnm             -> Fast Node Manager (Node 22 LTS ready)\n"
+printf "  pnpm            -> Fast, disk space efficient package manager\n"
+printf "  uv              -> Modern, blazing fast Python package manager\n"
+printf "  tldr <cmd>      -> Quick community cheat sheets\n"
+printf "  delta           -> Syntax-highlighting git diff pager\n\n"

@@ -39,6 +39,15 @@ chmod +x setup.sh
   - `zoxide` for directory jumping (`z <dir>`).
   - `fzf` without bulky borders (`Ctrl+R` for history, `Ctrl+T` for files).
   - `lazygit` for terminal git workflow (`lg`).
+  - `delta` for syntax-highlighted git diffs and logs.
+  - `fnm` for blazing fast Node version management (pre-configured with Node 22 LTS).
+  - `pnpm` fast disk-efficient package manager.
+  - `uv` ultra-fast Python package and virtual environment manager.
+  - `tealdeer` (`tldr`) instant cheat sheets for shell commands.
+  - `direnv` per-directory environment variable isolation.
+  - `dust` visual disk usage inspection (`du`).
+  - `neovim` (`nvim`) modern terminal text editor.
+  - `OrbStack` fast, low-overhead Docker & Linux container runtime.
   - `btop` for resource monitoring.
 
 ---
@@ -54,6 +63,9 @@ chmod +x setup.sh
 | `cat <file>` | Fast syntax-highlighted viewer via `bat` |
 | `z <dir>` | Intelligent directory jump via `zoxide` |
 | `lg` | Launch LazyGit |
+| `v` / `vi` | Open Neovim |
+| `du` | Interactive disk usage tree via `dust` |
+| `tldr <cmd>` | Instant CLI cheat sheet via `tealdeer` |
 | `Ctrl + R` | Fuzzy history search |
 | `Ctrl + T` | Fuzzy file path search |
 | `glog` | Compact one-line Git log graph |
